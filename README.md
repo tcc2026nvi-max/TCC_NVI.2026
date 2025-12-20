@@ -79,6 +79,7 @@ src/app/api/
 ├── categoria/
 ├── transacao/
 └── tag/
+```
 
 Cada pasta contém um arquivo `route.js` responsável por definir
 os métodos HTTP da entidade correspondente(GET, POST, DELETE).

@@ -71,6 +71,7 @@ a exposição desnecessária da estrutura interna do banco de dados.
 
 A API segue a seguinte estrutura:
 
+```text
 src/app/api/
 ├── usuario/
 ├── projeto/

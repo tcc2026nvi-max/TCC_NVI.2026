@@ -1,29 +1,90 @@
-import { NextResponse } from 'next/server';
-import pool from '@/lib/bd';
+import { NextResponse } from "next/server";
+import pool from "@/lib/bd";
 
+/* =========================
+   GET – listar tags
+========================= */
 export async function GET() {
-  const result = await pool.query('SELECT * FROM Tag');
-  return NextResponse.json(result.rows);
+  try {
+    const result = await pool.query(
+      "SELECT tag_id, nome FROM Tag ORDER BY nome"
+    );
+
+    return NextResponse.json(result.rows, { status: 200 });
+
+  } catch (error) {
+    console.error("Erro ao buscar tags:", error);
+    return NextResponse.json(
+      { erro: "Erro ao buscar tags" },
+      { status: 500 }
+    );
+  }
 }
 
-export async function POST(req) {
-  const { nome } = await req.json();
+/* =========================
+   POST – criar tag
+========================= */
+export async function POST(request) {
+  try {
+    const { nome } = await request.json();
 
-  const result = await pool.query(
-    'INSERT INTO Tag (nome) VALUES ($1) RETURNING *',
-    [nome]
-  );
+    if (!nome) {
+      return NextResponse.json(
+        { erro: "Nome da tag é obrigatório" },
+        { status: 400 }
+      );
+    }
 
-  return NextResponse.json(result.rows[0], { status: 201 });
+    const result = await pool.query(
+      `
+      INSERT INTO Tag (nome)
+      VALUES ($1)
+      RETURNING tag_id, nome
+      `,
+      [nome]
+    );
+
+    return NextResponse.json(result.rows[0], { status: 201 });
+
+  } catch (error) {
+    console.error("Erro ao criar tag:", error);
+    return NextResponse.json(
+      { erro: "Erro ao criar tag" },
+      { status: 500 }
+    );
+  }
 }
 
-export async function DELETE(req) {
-  const { tag_id } = await req.json();
+/* =========================
+   DELETE – excluir tag
+========================= */
+export async function DELETE(request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const tag_id = searchParams.get("id");
 
-  await pool.query(
-    'DELETE FROM Tag WHERE tag_id = $1',
-    [tag_id]
-  );
+    if (!tag_id) {
+      return NextResponse.json(
+        { erro: "ID da tag é obrigatório" },
+        { status: 400 }
+      );
+    }
 
-  return NextResponse.json({ message: 'Tag removida' });
+    await pool.query(
+      "DELETE FROM Tag WHERE tag_id = $1",
+      [tag_id]
+    );
+
+    return NextResponse.json(
+      { mensagem: "Tag excluída com sucesso" },
+      { status: 200 }
+    );
+
+  } catch (error) {
+    console.error("Erro ao excluir tag:", error);
+    return NextResponse.json(
+      { erro: "Erro ao excluir tag" },
+      { status: 500 }
+    );
+  }
 }

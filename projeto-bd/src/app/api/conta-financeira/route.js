@@ -1,37 +1,95 @@
-import { NextResponse } from 'next/server';
-import pool from '@/lib/bd';
+import { NextResponse } from "next/server";
+import pool from "@/lib/bd";
 
+/* =========================
+   GET – listar contas
+========================= */
 export async function GET() {
-  const result = await pool.query(`
-    SELECT c.conta_id, c.nome, c.tipo, c.saldo_inicial, u.nome AS usuario
-    FROM ContaFinanceira c
-    JOIN Usuario u ON u.usuario_id = c.usuario_id
-  `);
-  return NextResponse.json(result.rows);
+  try {
+    const result = await pool.query(`
+      SELECT 
+        c.conta_id,
+        c.nome,
+        c.tipo,
+        c.saldo_inicial,
+        c.moeda,
+        u.nome AS usuario
+      FROM ContaFinanceira c
+      JOIN Usuario u ON c.usuario_id = u.usuario_id
+      ORDER BY c.nome
+    `);
+
+    return NextResponse.json(result.rows);
+  } catch (error) {
+    console.error("Erro ao buscar contas:", error);
+    return NextResponse.json(
+      { erro: "Erro ao buscar contas financeiras" },
+      { status: 500 }
+    );
+  }
 }
 
-export async function POST(req) {
-  const { nome, tipo, saldo_inicial, moeda, usuario_id } = await req.json();
+/* =========================
+   POST – criar conta
+========================= */
+export async function POST(request) {
+  try {
+    const body = await request.json();
+    const { nome, tipo, saldo_inicial, moeda, usuario_id } = body;
 
-  const result = await pool.query(
-    `
-    INSERT INTO ContaFinanceira (nome, tipo, saldo_inicial, moeda, usuario_id)
-    VALUES ($1,$2,$3,$4,$5)
-    RETURNING *
-    `,
-    [nome, tipo, saldo_inicial, moeda, usuario_id]
-  );
+    if (!nome || !usuario_id) {
+      return NextResponse.json(
+        { erro: "Nome e usuário são obrigatórios" },
+        { status: 400 }
+      );
+    }
 
-  return NextResponse.json(result.rows[0], { status: 201 });
+    const result = await pool.query(
+      `
+      INSERT INTO ContaFinanceira
+      (nome, tipo, saldo_inicial, moeda, usuario_id)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING *
+      `,
+      [nome, tipo, saldo_inicial, moeda, usuario_id]
+    );
+
+    return NextResponse.json(result.rows[0], { status: 201 });
+  } catch (error) {
+    console.error("Erro ao criar conta:", error);
+    return NextResponse.json(
+      { erro: "Erro ao criar conta financeira" },
+      { status: 500 }
+    );
+  }
 }
 
-export async function DELETE(req) {
-  const { conta_id } = await req.json();
+/* =========================
+   DELETE – excluir conta
+========================= */
+export async function DELETE(request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
 
-  await pool.query(
-    'DELETE FROM ContaFinanceira WHERE conta_id = $1',
-    [conta_id]
-  );
+    if (!id) {
+      return NextResponse.json(
+        { erro: "ID da conta é obrigatório" },
+        { status: 400 }
+      );
+    }
 
-  return NextResponse.json({ message: 'Conta removida' });
+    await pool.query(
+      "DELETE FROM ContaFinanceira WHERE conta_id = $1",
+      [id]
+    );
+
+    return NextResponse.json({ mensagem: "Conta excluída com sucesso" });
+  } catch (error) {
+    console.error("Erro ao excluir conta:", error);
+    return NextResponse.json(
+      { erro: "Erro ao excluir conta financeira" },
+      { status: 500 }
+    );
+  }
 }

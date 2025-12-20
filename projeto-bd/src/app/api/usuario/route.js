@@ -1,35 +1,86 @@
-import { NextResponse } from 'next/server';
 import pool from '@/lib/bd';
 
+/* =========================
+   GET - Listar usuários
+========================= */
 export async function GET() {
-  const result = await pool.query(
-    'SELECT usuario_id, nome, email, role FROM Usuario'
-  );
-  return NextResponse.json(result.rows);
+  try {
+    const result = await pool.query(
+      'SELECT usuario_id, nome, email, telefone, role, criado_em FROM Usuario'
+    );
+
+    return Response.json(result.rows, { status: 200 });
+
+  } catch (error) {
+    console.error(error);
+    return Response.json(
+      { error: 'Erro ao buscar usuários' },
+      { status: 500 }
+    );
+  }
 }
 
-export async function POST(req) {
-  const { nome, email, senha_hash, role } = await req.json();
+/* =========================
+   POST - Criar usuário
+========================= */
+export async function POST(request) {
+  try {
+    const { nome, email, telefone, senha_hash, role } = await request.json();
 
-  const result = await pool.query(
-    `
-    INSERT INTO Usuario (nome, email, senha_hash, role)
-    VALUES ($1, $2, $3, $4)
-    RETURNING usuario_id, nome, email, role
-    `,
-    [nome, email, senha_hash, role]
-  );
+    if (!nome || !email || !senha_hash || !role) {
+      return Response.json(
+        { error: 'Campos obrigatórios não preenchidos' },
+        { status: 400 }
+      );
+    }
 
-  return NextResponse.json(result.rows[0], { status: 201 });
+    const result = await pool.query(
+      `INSERT INTO Usuario (nome, email, telefone, senha_hash, role)
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING usuario_id, nome, email, role`,
+      [nome, email, telefone, senha_hash, role]
+    );
+
+    return Response.json(result.rows[0], { status: 201 });
+
+  } catch (error) {
+    console.error(error);
+    return Response.json(
+      { error: 'Erro ao criar usuário' },
+      { status: 500 }
+    );
+  }
 }
 
-export async function DELETE(req) {
-  const { usuario_id } = await req.json();
+/* =========================
+   DELETE - Remover usuário
+========================= */
+export async function DELETE(request) {
+  try {
+    const { usuario_id } = await request.json();
 
-  await pool.query(
-    'DELETE FROM Usuario WHERE usuario_id = $1',
-    [usuario_id]
-  );
+    if (!usuario_id) {
+      return Response.json(
+        { error: 'usuario_id é obrigatório' },
+        { status: 400 }
+      );
+    }
 
-  return NextResponse.json({ message: 'Usuário removido' });
+    await pool.query(
+      'DELETE FROM Usuario WHERE usuario_id = $1',
+      [usuario_id]
+    );
+
+    return Response.json(
+      { message: 'Usuário removido com sucesso' },
+      { status: 200 }
+    );
+
+  } catch (error) {
+    console.error(error);
+    return Response.json(
+      { error: 'Erro ao deletar usuário' },
+      { status: 500 }
+    );
+  }
 }

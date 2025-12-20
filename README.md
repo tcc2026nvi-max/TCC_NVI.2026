@@ -1,4 +1,4 @@
-# Projeto BD – API em Next.js
+# Projeto BD – PlaneFinance — Plataforma inteligente para planejamento financeiro pessoal.
 
 ## 1. Descrição do Projeto
 

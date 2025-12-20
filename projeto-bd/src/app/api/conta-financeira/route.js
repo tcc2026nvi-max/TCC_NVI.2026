@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
 import pool from "@/lib/bd";
 
-/* =========================
-   GET – listar contas
-========================= */
+// get
+
 export async function GET() {
   try {
     const result = await pool.query(`
@@ -29,9 +28,8 @@ export async function GET() {
   }
 }
 
-/* =========================
-   POST – criar conta
-========================= */
+// post
+
 export async function POST(request) {
   try {
     const body = await request.json();
@@ -64,9 +62,7 @@ export async function POST(request) {
   }
 }
 
-/* =========================
-   DELETE – excluir conta
-========================= */
+// delete
 export async function DELETE(request) {
   try {
     const { searchParams } = new URL(request.url);

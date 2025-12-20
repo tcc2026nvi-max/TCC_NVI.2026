@@ -1,8 +1,7 @@
 import pool from '@/lib/bd';
 
-/* =========================
-   GET - Listar usuários
-========================= */
+// get
+
 export async function GET() {
   try {
     const result = await pool.query(
@@ -20,9 +19,8 @@ export async function GET() {
   }
 }
 
-/* =========================
-   POST - Criar usuário
-========================= */
+// post
+
 export async function POST(request) {
   try {
     const { nome, email, telefone, senha_hash, role } = await request.json();
@@ -52,9 +50,8 @@ export async function POST(request) {
   }
 }
 
-/* =========================
-   DELETE - Remover usuário
-========================= */
+// delete
+
 export async function DELETE(request) {
   try {
     const { usuario_id } = await request.json();

@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
 import pool from "@/lib/bd";
 
-/* =========================
-   GET → Listar transações
-   ========================= */
+// get
+
 export async function GET() {
   try {
     const result = await pool.query(`
@@ -35,9 +34,8 @@ export async function GET() {
   }
 }
 
-/* =========================
-   POST → Criar transação
-   ========================= */
+// post
+
 export async function POST(request) {
   try {
     const {
@@ -91,9 +89,8 @@ export async function POST(request) {
 }
 
 
-/* =========================
-   DELETE → Excluir transação
-   ========================= */
+// delete
+
 export async function DELETE(request) {
   try {
     const { transacao_id } = await request.json();

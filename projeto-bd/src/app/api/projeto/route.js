@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
 import pool from "@/lib/bd";
 
-/* =========================
-   GET → Listar projetos
-   ========================= */
+// get
+
 export async function GET() {
   try {
     const result = await pool.query(`
@@ -32,9 +31,8 @@ export async function GET() {
   }
 }
 
-/* =========================
-   POST → Criar projeto
-   ========================= */
+// post
+
 export async function POST(request) {
   try {
     const {
@@ -76,9 +74,8 @@ export async function POST(request) {
   }
 }
 
-/* =========================
-   DELETE → Excluir projeto
-   ========================= */
+// delete
+
 export async function DELETE(request) {
   try {
     const { projeto_id } = await request.json();

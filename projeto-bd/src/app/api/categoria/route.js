@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
 import pool from "@/lib/bd";
 
-/* =========================
-   GET – listar categorias
-========================= */
+// get
+
 export async function GET() {
   try {
     const result = await pool.query(`
@@ -27,9 +26,8 @@ export async function GET() {
   }
 }
 
-/* =========================
-   POST – criar categoria
-========================= */
+// post
+
 export async function POST(request) {
   try {
     const body = await request.json();
@@ -68,9 +66,8 @@ export async function POST(request) {
   }
 }
 
-/* =========================
-   DELETE – excluir categoria
-========================= */
+//delete 
+
 export async function DELETE(request) {
   try {
     const { searchParams } = new URL(request.url);

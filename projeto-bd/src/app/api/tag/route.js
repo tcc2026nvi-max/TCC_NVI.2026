@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
 import pool from "@/lib/bd";
 
-/* =========================
-   GET – listar tags
-========================= */
+// get 
+
 export async function GET() {
   try {
     const result = await pool.query(
@@ -21,9 +20,8 @@ export async function GET() {
   }
 }
 
-/* =========================
-   POST – criar tag
-========================= */
+// post
+
 export async function POST(request) {
   try {
     const { nome } = await request.json();
@@ -55,9 +53,8 @@ export async function POST(request) {
   }
 }
 
-/* =========================
-   DELETE – excluir tag
-========================= */
+// delete
+
 export async function DELETE(request) {
   try {
     const { searchParams } = new URL(request.url);
